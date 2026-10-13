@@ -28,6 +28,7 @@ VALIDATE(){
     fi
 }
 
+###NODEJS INSTALLATION#####
 dnf module disable nodejs -y &>>$LOG_FILE
 VALIDATE $? "disabling nodejs"
 
@@ -37,10 +38,15 @@ VALIDATE $? "enabling nodejs 20"
 dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "installed nodejs"
 
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-VALIDATE $? "created system user"
+id roboshop
+if [ $? -ne 0 ]; then
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    VALIDATE $? "created system user"
+else
+    echo -e "user already exists....$Y SKIPPING $N"
+fi
 
-mkdir /app 
+mkdir -p /app 
 VALIDATE $? "creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
@@ -49,6 +55,7 @@ VALIDATE $? "downloading catalogue application"
 cd /app 
 VALIDATE $? "changing to app directory"
 
+rm -rf /app/*
 unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "unzipped catalogue"
 
