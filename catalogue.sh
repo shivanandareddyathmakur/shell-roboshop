@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
+SCRIPT_DIR=$PWD
 mkdir -p $LOGS_FOLDER
 
 echo "script started ececuted at: $(date)" | tee -a $LOG_FILE #&>>$LOG_FILE only in logs
@@ -34,7 +35,7 @@ dnf module enable nodejs:20 -y
 VALIDATE $? "enabling nodejs 20"
 
 dnf install nodejs -y
-VALIDATE $? "instlled nodejs"
+VALIDATE $? "installed nodejs"
 
 useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
 VALIDATE $? "created system user"
@@ -52,7 +53,7 @@ unzip /tmp/catalogue.zip
 VALIDATE $? "unzipped catalogue"
 
 npm install 
-VALIDATE $? "installing dependencies"
+VALIDATE $? "installed dependencies"
 
 cp catalogue.service /etc/systemd/system/catalogue.service
 VALIDATE $? "creating catalogue service"
@@ -65,7 +66,7 @@ VALIDATE $? "enabling catalogue"
 systemctl start catalogue
 VALIDATE $? "starting catalogue"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "copy mongo repo"
 
 dnf install mongodb-mongosh -y
