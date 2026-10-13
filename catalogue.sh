@@ -10,6 +10,7 @@ LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 SCRIPT_DIR=$PWD
+MONGO_HOST=mongodb.reddy25.shop
 mkdir -p $LOGS_FOLDER
 
 echo "script started ececuted at: $(date)" | tee -a $LOG_FILE #&>>$LOG_FILE only in logs
@@ -40,7 +41,7 @@ VALIDATE $? "installed nodejs"
 
 id roboshop
 if [ $? -ne 0 ]; then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop  &>>$LOG_FILE
     VALIDATE $? "created system user"
 else
     echo -e "user already exists....$Y SKIPPING $N"
@@ -49,7 +50,7 @@ fi
 mkdir -p /app 
 VALIDATE $? "creating app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip  &>>$LOG_FILE
 VALIDATE $? "downloading catalogue application"
 
 cd /app 
@@ -67,7 +68,7 @@ VALIDATE $? "creating catalogue service"
 
 systemctl daemon-reload
 
-systemctl enable catalogue 
+systemctl enable catalogue   &>>$LOG_FILE
 VALIDATE $? "enabling catalogue"
 
 systemctl start catalogue
@@ -79,7 +80,7 @@ VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "installed mongodb client"
 
-mongosh --host mongodb.reddy25.shop </app/db/master-data.js &>>$LOG_FILE
+mongosh --host $MONGO_HOST </app/db/master-data.js &>>$LOG_FILE
 VALIDATE $? "load catalogue products"
 
 systemctl restart catalogue
