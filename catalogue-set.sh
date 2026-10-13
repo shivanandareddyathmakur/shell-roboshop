@@ -55,7 +55,7 @@ systemctl daemon-reload
 
 systemctl enable catalogue   &>>$LOG_FILE
 
-systemctl start catalogueeeee
+systemctl start catalogue
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 
