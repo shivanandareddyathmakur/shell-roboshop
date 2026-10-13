@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 USER_ID=$(id -u)
 
 R="\e[31m"
@@ -26,20 +27,6 @@ VALIDATE(){
         echo -e "$2 ... $G success $N"
     fi
 }
-
-for package in $@
-do
-    #here to check if package is already installed or not
-    dnf list installed $package &>>$LOG_FILE
-    
-    #if the exit status is 0 already installed, if -ne to 0, then it'll install
-    if [ $? -ne 0 ]; then
-        dnf install $package -y &>>$LOG_FILE
-        VALIDATE $? "$package"
-    else
-        echo -e "$package already installed..$Y SKIPPING $N"
-    fi
-done
 
 cp mongo.repo vim /etc/yum.repos.d/mongo.repo
 VALIDATE $? "adding mongo repo"
