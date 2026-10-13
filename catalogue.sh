@@ -28,13 +28,13 @@ VALIDATE(){
     fi
 }
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>>$LOG_FILE
 VALIDATE $? "disabling nodejs"
 
-dnf module enable nodejs:20 -y
+dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "enabling nodejs 20"
 
-dnf install nodejs -y
+dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "installed nodejs"
 
 useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
@@ -49,10 +49,10 @@ VALIDATE $? "downloading catalogue application"
 cd /app 
 VALIDATE $? "changing to app directory"
 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>$LOG_FILE
 VALIDATE $? "unzipped catalogue"
 
-npm install 
+npm install  &>>$LOG_FILE
 VALIDATE $? "installed dependencies"
 
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
@@ -69,10 +69,10 @@ VALIDATE $? "starting catalogue"
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 VALIDATE $? "copy mongo repo"
 
-dnf install mongodb-mongosh -y
+dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "installed mongodb client"
 
-mongosh --host mongodb.reddy25.shop </app/db/master-data.js
+mongosh --host mongodb.reddy25.shop </app/db/master-data.js &>>$LOG_FILE
 VALIDATE $? "load catalogue products"
 
 systemctl restart catalogue
