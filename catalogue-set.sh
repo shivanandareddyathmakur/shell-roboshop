@@ -6,11 +6,8 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
-set -euo pipefail
-<<<<<<< HEAD
-=======
+set -euo pipefail  #by using set -e the script will stop ececuting when an error occurs
 
->>>>>>> b1ed7d7975753cac730539ff32132b91cfb37fb1
 trap 'echo "there is an error in $LINENO, commad is : $BASH_COMMAND"' ERR
 
 LOGS_FOLDER="/var/log/shell-roboshop"
@@ -27,12 +24,22 @@ if [ $USER_ID -ne 0 ]; then
     exit 1 #failure is other than 0
 fi
 
+VALIDATE(){
+    if [ $1 -ne 0 ]; then
+        echo -e "$2 ... $R failed $N" | tee -a $LOG_FILE
+        #exit 1 - if you want to dont continue when an failure occurs
+    else 
+        echo -e "$2 ... $G success $N"
+    fi
+}
+
 ###NODEJS INSTALLATION#####
 dnf module disable nodejs -y &>>$LOG_FILE
 
 dnf module enable nodejs:20 -y &>>$LOG_FILE
 
 dnf install nodejs -y &>>$LOG_FILE
+VALIDATE $? "installed nodejs"
 
 id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]; then
@@ -63,6 +70,7 @@ systemctl start catalogue
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
 
 dnf install mongodb-mongosh -y &>>$LOG_FILE
+VALIDATE $? "installed mongodb client"
 
 INDEX=$(mongosh mongodb.reddy25.shop --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 if [ $INDEX -lt 0 ]; then
