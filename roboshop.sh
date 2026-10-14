@@ -2,7 +2,7 @@
 
 AMI_ID="ami-0220d79f3f480ecf5" # replace each with your server AMI ID 
 SG_ID="sg-03765871e0a2431be"  #replace with your security group ID 
-ZONE_ID="Z03636913QJEOCADGO5S1" # Replay with your Route 53 zonID
+ZONE_ID="Z03636913QJEOCADGO5S1" # Replay with your Route 53 zoneID
 DOMAIN_NAME="reddy25.shop"
 
 for instance in $@

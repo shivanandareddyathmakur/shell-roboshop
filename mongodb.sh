@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 USER_ID=$(id -u)
 
 R="\e[31m"
@@ -39,3 +38,9 @@ VALIDATE $? "enable mongodb"
 
 systemctl start mongod 
 VALIDATE $? "start mongodb"
+
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
+VALIDATE $? "allowing remote connections to mongodb"
+
+systemctl restart mongod
+VALIDATE $? "restarted mongodb"
