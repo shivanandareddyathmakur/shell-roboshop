@@ -10,7 +10,7 @@ LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 SCRIPT_DIR=$PWD
-MONGO_HOST=mongodb.reddy25.shop
+MONGODB_HOST=mongodb.reddy25.shop
 mkdir -p $LOGS_FOLDER
 
 echo "script started ececuted at: $(date)" | tee -a $LOG_FILE #&>>$LOG_FILE only in logs
@@ -81,7 +81,7 @@ dnf install mongodb-mongosh -y &>>$LOG_FILE
 VALIDATE $? "installed mongodb client"
 
 INDEX=$(mongosh mongodb.reddy25.shop --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
-if [ $INDEX -lt 0 ]; then
+if [ $INDEX -le 0 ]; then
     mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
     VALIDATE $? "Load catalogue products"
 else
