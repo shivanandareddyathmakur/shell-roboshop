@@ -9,6 +9,7 @@ N="\e[0m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
+START_TIME=$(date +%s)
 mkdir -p $LOGS_FOLDER
 
 echo "script started ececuted at: $(date)" | tee -a $LOG_FILE #&>>$LOG_FILE only in logs
@@ -44,3 +45,7 @@ VALIDATE $? "allowing remote connections to mongodb"
 
 systemctl restart mongod
 VALIDATE $? "restarted mongodb"
+
+END_TIME=$(date +%s)
+TOTAL_TIME=$(( $END_TIME - $START_TIME))
+echo -e "script executed in : $Y $TOTAL_TIME seconds $N"
