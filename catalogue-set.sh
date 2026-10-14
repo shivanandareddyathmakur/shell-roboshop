@@ -7,6 +7,10 @@ Y="\e[33m"
 N="\e[0m"
 
 set -euo pipefail
+<<<<<<< HEAD
+=======
+
+>>>>>>> b1ed7d7975753cac730539ff32132b91cfb37fb1
 trap 'echo "there is an error in $LINENO, commad is : $BASH_COMMAND"' ERR
 
 LOGS_FOLDER="/var/log/shell-roboshop"
