@@ -14,6 +14,8 @@ LOG_FILE=$LOGS_FOLDER/$SCRIPT_NAME.log
 MONGODB_HOST=mongodb.reddy25.shop
 MYSQL_HOST=mysql.reddy25.shop
 
+echo "Script started excuted at: $(date)"
+
 mkdir -p $LOGS_FOLDER
 
 if [ $USERID -ne 0 ]; then
@@ -30,7 +32,7 @@ VALIDATE(){
     fi
 }
 
-dnf install maven -y
+dnf install maven -y &>>$LOG_FILE
 VALIDATE $? "installing maven"
 
 id roboshop
@@ -44,7 +46,7 @@ fi
 mkdir -p /app 
 VALIDATE $? "creating app directory"
 
-curl -L -o /tmp/shipping.zip https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip 
+curl -L -o /tmp/shipping.zip https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip  &>>$LOG_FILE
 VALIDATE $? "downloading shipping application"
 
 cd /app 
@@ -56,7 +58,7 @@ VALIDATE $? "clearing old apps in app directory"
 unzip /tmp/shipping.zip
 VALIDATE $? "unzipping shipping"
 
-mvn clean package 
+mvn clean package  &>>$LOG_FILE
 mv target/shipping-1.0.jar shipping.jar 
 
 cp $SCRIPT_PATH/shipping.service /etc/systemd/system/shipping.service
@@ -65,7 +67,7 @@ VALIDATE $? "copying shipping.service"
 systemctl daemon-reload
 systemctl enable shipping 
 
-dnf install mysql -y 
+dnf install mysql -y &>>$LOG_FILE
 VALIDATE $? "installing mysql"
 
 mysql -h $MYSQL_HOST -uroot -pRoboShop@1 -e 'use cities' &>>$LOG_FILE
