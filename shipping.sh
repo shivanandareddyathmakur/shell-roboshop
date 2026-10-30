@@ -1,9 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail  #by using set -e the script will stop ececuting when an error occurs
-
-trap 'echo "there is an error in $LINENO, commad is : $BASH_COMMAND"' ERR
-
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
