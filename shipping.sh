@@ -55,7 +55,7 @@ VALIDATE $? "moving to app directory"
 rm -rf /app/*
 VALIDATE $? "clearing old apps in app directory"
 
-unzip /tmp/shipping.zip
+unzip /tmp/shipping.zip &>>$LOG_FILE
 VALIDATE $? "unzipping shipping"
 
 mvn clean package  &>>$LOG_FILE
