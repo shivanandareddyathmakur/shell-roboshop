@@ -32,10 +32,10 @@ VALIDATE(){
     fi
 }
 
-dnf install maven -y 
+dnf install maven -y &>>$LOG_FILE
 VALIDATE $? "installing maven"
 
-id roboshop
+id roboshop &>>$LOG_FILE
     if [ $? -ne 0 ]; then
         useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
         VALIDATE $? "creating system user"
@@ -43,7 +43,7 @@ id roboshop
         echo -e "system user already exists $Y SKIPPING $N"
     fi
 
-mkdir -p /app 
+mkdir -p /app  &>>$LOG_FILE
 VALIDATE $? "creating app directory"
 
 curl -L -o /tmp/shipping.zip https://roboshop-artifacts.s3.amazonaws.com/shipping-v3.zip  &>>$LOG_FILE
@@ -59,7 +59,7 @@ unzip /tmp/shipping.zip
 VALIDATE $? "unzipping shipping"
 
 mvn clean package  &>>$LOG_FILE
-mv target/shipping-1.0.jar shipping.jar 
+mv target/shipping-1.0.jar shipping.jar  &>>$LOG_FILE
 
 cp $SCRIPT_PATH/shipping.service /etc/systemd/system/shipping.service
 VALIDATE $? "copying shipping.service"
