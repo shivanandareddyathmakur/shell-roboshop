@@ -34,21 +34,30 @@ dnf install python3 gcc python3-devel -y &>>$LOG_FILE
 VALIDATE $? "installing python"
 
 id roboshop &>>$LOG_FILE
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
 else
     echo "user already exists"
 fi
 
 mkdir -p /app 
+VALIDATE $? "creating app directory"
 
-curl -L -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip 
+curl -L -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip
+VALIDATE $? "downloading payment application"
+
 cd /app 
+VALIDATE $? "moving to app directory"
+
 rm -rf /app/*
-unzip /tmp/payment.zip
+
+unzip /tmp/payment.zip &>>$LOG_FILE
+VALIDATE $? "unzipping payment.zip"
 
 cd /app 
+
 pip3 install -r requirements.txt &>>$LOG_FILE
+VALIDATE $? "installing packages"
 
 cp $SCRIPT_PATH/payment.service /etc/systemd/system/payment.service
 
