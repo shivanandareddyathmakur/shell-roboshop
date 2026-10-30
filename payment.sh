@@ -48,7 +48,7 @@ rm -rf /app/*
 unzip /tmp/payment.zip
 
 cd /app 
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt &>>$LOG_FILE
 
 cp $SCRIPT_PATH/payment.service /etc/systemd/system/payment.service
 
