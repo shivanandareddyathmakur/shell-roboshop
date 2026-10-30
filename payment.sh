@@ -49,7 +49,7 @@ unzip /tmp/payment.zip
 cd /app 
 pip3 install -r requirements.txt
 
-vim /etc/systemd/system/payment.service
+cp $SCRIPT_PATH/payment.service /etc/systemd/system/payment.service
 
 systemctl daemon-reload
 
