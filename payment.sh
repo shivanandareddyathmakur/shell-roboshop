@@ -30,17 +30,6 @@ VALIDATE(){
     fi
 }
 
-dnf install maven -y &>>$LOG_FILE
-VALIDATE $? "installing maven"
-
-id roboshop &>>$LOG_FILE
-    if [ $? -ne 0 ]; then
-        useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-        VALIDATE $? "creating system user"
-    else
-        echo -e "system user already exists $Y SKIPPING $N"
-    fi
-
 dnf install python3 gcc python3-devel -y &>>$LOG_FILE
 VALIDATE $? "installing python"
 
