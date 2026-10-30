@@ -1,6 +1,6 @@
 #!/bin/bash
-USER_ID=$(id -u)
 
+USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
@@ -8,80 +8,75 @@ N="\e[0m"
 
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
-LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 SCRIPT_DIR=$PWD
-START_TIME=$(date +%s)
-MONGODB_HOST=mongodb.reddy25.shop
+MONGODB_HOST=mongodb.daws86s.fun
+LOG_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log" # /var/log/shell-script/16-logs.log
+
 mkdir -p $LOGS_FOLDER
+echo "Script started executed at: $(date)" | tee -a $LOG_FILE
 
-echo "script started ececuted at: $(date)" | tee -a $LOG_FILE #&>>$LOG_FILE only in logs
-
-if [ $USER_ID -ne 0 ]; then
-    echo -e "$R ERROR $N:: please run this script with root privelege"
-    exit 1 #failure is other than 0
+if [ $USERID -ne 0 ]; then
+    echo "ERROR:: Please run this script with root privelege"
+    exit 1 # failure is other than 0
 fi
 
-VALIDATE(){
+VALIDATE(){ # functions receive inputs through args just like shell script args
     if [ $1 -ne 0 ]; then
-        echo -e "$2 ... $R failed $N" | tee -a $LOG_FILE
-        #exit 1 - if you want to dont continue when an failure occurs
-    else 
-        echo -e "$2 ... $G success $N"
+        echo -e "$2 ... $R FAILURE $N" | tee -a $LOG_FILE
+        exit 1
+    else
+        echo -e "$2 ... $G SUCCESS $N" | tee -a $LOG_FILE
     fi
 }
 
-###NODEJS INSTALLATION#####
+##### NodeJS ####
 dnf module disable nodejs -y &>>$LOG_FILE
-VALIDATE $? "disabling nodejs"
-
-dnf module enable nodejs:20 -y &>>$LOG_FILE
-VALIDATE $? "enabling nodejs 20"
-
+VALIDATE $? "Disabling NodeJS"
+dnf module enable nodejs:20 -y  &>>$LOG_FILE
+VALIDATE $? "Enabling NodeJS 20"
 dnf install nodejs -y &>>$LOG_FILE
-VALIDATE $? "installed nodejs"
+VALIDATE $? "Installing NodeJS"
 
 id roboshop &>>$LOG_FILE
 if [ $? -ne 0 ]; then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop  &>>$LOG_FILE
-    VALIDATE $? "created system user"
+    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
+    VALIDATE $? "Creating system user"
 else
-    echo -e "user already exists....$Y SKIPPING $N"
+    echo -e "User already exist ... $Y SKIPPING $N"
 fi
 
-mkdir -p /app 
-VALIDATE $? "creating app directory"
+mkdir -p /app
+VALIDATE $? "Creating app directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip  &>>$LOG_FILE
-VALIDATE $? "downloading catalogue application"
+curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOG_FILE
+VALIDATE $? "Downloading catalogue application"
 
 cd /app 
-VALIDATE $? "changing to app directory"
+VALIDATE $? "Changing to app directory"
 
 rm -rf /app/*
-unzip /tmp/catalogue.zip &>>$LOG_FILE
-VALIDATE $? "unzipped catalogue"
+VALIDATE $? "Removing existing code"
 
-npm install  &>>$LOG_FILE
-VALIDATE $? "installed dependencies"
+unzip /tmp/catalogue.zip &>>$LOG_FILE
+VALIDATE $? "unzip catalogue"
+
+npm install &>>$LOG_FILE
+VALIDATE $? "Install dependencies"
 
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
-VALIDATE $? "creating catalogue service"
+VALIDATE $? "Copy systemctl service"
 
 systemctl daemon-reload
-
-systemctl enable catalogue   &>>$LOG_FILE
-VALIDATE $? "enabling catalogue"
-
-systemctl start catalogue
-VALIDATE $? "starting catalogue"
+systemctl enable catalogue &>>$LOG_FILE
+VALIDATE $? "Enable catalogue"
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo
-VALIDATE $? "copy mongo repo"
+VALIDATE $? "Copy mongo repo"
 
 dnf install mongodb-mongosh -y &>>$LOG_FILE
-VALIDATE $? "installed mongodb client"
+VALIDATE $? "Install MongoDB client"
 
-INDEX=$(mongosh mongodb.reddy25.shop --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
+INDEX=$(mongosh mongodb.daws86s.fun --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 if [ $INDEX -le 0 ]; then
     mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOG_FILE
     VALIDATE $? "Load catalogue products"
@@ -90,8 +85,4 @@ else
 fi
 
 systemctl restart catalogue
-VALIDATE $? "restarted catalogue"
-
-END_TIME=$(date +%s)
-TOTAL_TIME=$(( $END_TIME - $START_TIME))
-echo -e "script executed in : $Y $TOTAL_TIME seconds $N"
+VALIDATE $? "Restarted catalogue"
