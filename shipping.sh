@@ -40,12 +40,12 @@ dnf install maven -y
 VALIDATE $? "installing maven"
 
 id roboshop
-if [ $? -ne 0 ]; then
-    useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
-    VALIDATE $? "creating system user"
-else
-    echo -e "system user already exists $Y SKIPPING $N"
-fi
+    if [ $? -ne 0 ]; then
+        useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+        VALIDATE $? "creating system user"
+    else
+        echo -e "system user already exists $Y SKIPPING $N"
+    fi
 
 mkdir -p /app 
 VALIDATE $? "creating app directory"
