@@ -1,9 +1,5 @@
 #!/bin/bash
 
-set -euo pipefail
-
-trap 'echo "There is an error in $LINENO, Command is: $BASH_COMMAND"' ERR
-
 USERID=$(id -u)
 R="\e[31m"
 G="\e[32m"
@@ -36,10 +32,10 @@ VALIDATE(){
     fi
 }
 
-dnf install maven -y
+dnf install maven -y &>>$LOG_FILE
 VALIDATE $? "installing maven"
 
-id roboshop
+id roboshop &>>$LOG_FILE
     if [ $? -ne 0 ]; then
         useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
         VALIDATE $? "creating system user"
